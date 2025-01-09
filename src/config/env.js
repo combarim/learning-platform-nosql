@@ -16,7 +16,7 @@ const requiredEnvVars = [
 // Validation des variables d'environnement
 function validateEnv() {
 
-  //vérifier que tous les variables d'environnement sont définies
+  //vérifier que toutes les variables d'environnement sont définies
   for (const envVar of requiredEnvVars) {
     if (!process.env[envVar]) {
       throw new Error(`Il manque la variable d'environnement: ${envVar}`);
@@ -25,7 +25,7 @@ function validateEnv() {
 
   const mongodbUriRegex = /^(mongodb(?:\+srv)?:\/\/)([a-zA-Z0-9\-_.]+)(?::([0-9]+))?(?:\/([a-zA-Z0-9\-_.]+))?(?:\?(.+))?$/;
   const redisUriRegex = /^redis:\/\/(?:[a-zA-Z0-9._%+-]+:[^@]+@)?[a-zA-Z0-9.-]+(?::\d+)?(?:\/\d+)?$/ 
-  const mongodbDbNameRegex = /^(?![0-9]\.)(?!.*[\\"/$\0]).{1,64}$/
+  const mongodbDbNameRegex = /^(?![0-9]\.)(?!.*[\\"/$\00]).{1,64}$/
   const mongodbDbName = process.env.MONGODB_DB_NAME
 
   //vérifie si mongodbUri est de la forme : mongodb[+srv]://[username:password@]host1[:port1][,...hostN[:portN]][/[defaultauthdb][?options]]
@@ -53,10 +53,14 @@ function validateEnv() {
 module.exports = {
   mongodb: {
     uri: process.env.MONGODB_URI,
-    dbName: process.env.MONGODB_DB_NAME
+    dbName: process.env.MONGODB_DB_NAME,
+    maxRetries: process.env.MONGODB_DB_MAX_RETRIES || 5,
+    retryDelay: process.env.MONGODB_DB_RETRY_DELAY || 2000,
   },
   redis: {
-    uri: process.env.REDIS_URI
+    uri: process.env.REDIS_URI,
+    maxRetries: process.env.REDIS_MAX_RETRIES || 5,
+    retryDelay: process.env.REDIS_RETRY_DELAY || 2000,
   },
   port: process.env.PORT || 3000
 };
